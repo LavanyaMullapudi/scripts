@@ -1,0 +1,39 @@
+# script to copy on cosmosdb to another cosmosdb
+
+from pymongo import MongoClient
+ 
+# Source Cosmos DB MongoDB API connection parameters
+source_uri = "mongodb://mysamplecosmosdb123:eXN5S5x0OVs1CysRMYetnUYuwnV0PXTOI2ZzpGe5JaoLWZLonyY8G2XGI0UlqBsUHbECAGthO7qPACDbBHRG0g==@mysamplecosmosdb123.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@mysamplecosmosdb123@"
+source_client = MongoClient(source_uri)
+ 
+# Destination Cosmos DB MongoDB API connection parameters
+destination_uri = "mongodb://importvsub:ErZvM7or9JNy9Hx4IyLa7rOSG5WpQptZqYd8hcztkp8NmS6GT9vmP5cdOVkk5HH22a7FTaEvbIp8ACDbN37sBg==@importvsub.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@importvsub@"
+destination_client = MongoClient(destination_uri)
+ 
+# Specify the source and destination databases and collections
+source_db_name = "sampleexport"
+destination_db_name = "importdb"
+collection_name = "samplecollection1"
+destination_collection_name = "importcollection1"
+# Function to perform data migration
+def migrate_data():
+    source_db = source_client[source_db_name]
+    destination_db = destination_client[destination_db_name]
+ 
+    source_collection = source_db[collection_name]
+    destination_collection = destination_db[destination_collection_name]
+ 
+    # Query all documents from the source collection
+    documents_to_migrate = source_collection.find({})
+ 
+    # Iterate through documents and insert into the destination collection
+    for document in documents_to_migrate:
+        destination_collection.insert_one(document)
+ 
+if __name__ == "__main__":
+    migrate_data()
+ 
+    # Close connections
+    source_client.close()
+    destination_client.close()
+ 
